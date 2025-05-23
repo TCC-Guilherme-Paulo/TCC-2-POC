@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minha-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minha-api
+  template:
+    metadata:
+      labels:
+        app: minha-api
+    spec:
+      containers:
+        - name: minha-api
+          image: activity-service:latest 
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"
+            limits:
+              cpu: "300m"
+          env:
+            - name: DATABASE_URL
+              value: "mongodb://mongo:27017/miaAjudaDB"
