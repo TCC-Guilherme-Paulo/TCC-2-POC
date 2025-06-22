@@ -25,6 +25,19 @@ spec:
           limits:
             memory: "512Mi"
             cpu: "500m"
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: "activityDB"
+        readinessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          tcpSocket:
+            port: 27017
+          initialDelaySeconds: 30
+          periodSeconds: 10
         volumeMounts:
         - name: mongodb-data
           mountPath: /data/db

@@ -6,9 +6,11 @@ metadata:
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    kubernetes.io/ingress.class: "nginx"
 spec:
   rules:
-  - http:
+  - host: activity-service.local
+    http:
       paths:
       - path: /
         pathType: Prefix

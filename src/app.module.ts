@@ -5,6 +5,7 @@ import { UsersModule } from './users/users.module';
 import { HelpsModule } from './help/help.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { CategoriesModule } from './categories/categories.module';
+import { AppController } from './app.controller';
 
 @Module({
   imports: [
@@ -13,7 +14,8 @@ import { CategoriesModule } from './categories/categories.module';
     UsersModule,
     HelpsModule,
     ActivitiesModule,
-    CategoriesModule
+    CategoriesModule,
   ],
+  controllers: [AppController],
 })
-export class AppModule {}
+export class AppModule { }
