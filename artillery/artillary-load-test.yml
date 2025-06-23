@@ -1,22 +1,22 @@
 config:
   target: http://127.0.0.1
   phases:
-    - duration: 60           # Warm up: 1 minuto
-      arrivalRate: 1         # Começa com 1 req/s
-      rampTo: 10             # Aumenta gradualmente até 10 req/s
+    - duration: 120           # Warm up: duração de 3 minutos (ajustável conforme necessário)
+      arrivalRate: 1          # Começa com 5 req/s
+      rampTo: 25              # Aumenta gradualmente até 50 req/s
       name: 'warm-up'
 
-    - duration: 120          # Sustain load: 2 minutos
-      arrivalRate: 20        # Mantém uma taxa estável de 20 req/s
+    - duration: 180           # Sustain load: duração de 5 minutos (ajustável)
+      arrivalRate: 70         # Mantém uma taxa estável de 50 req/s
       name: 'sustain-load'
 
-    - duration: 60           # Spike: 1 minuto
-      arrivalRate: 50        # Aumenta a taxa para 50 req/s
+    - duration: 120           # Spike: duração de 2 minutos
+      arrivalRate: 150        # Aumenta a taxa para 100 req/s
       name: 'spike-load'
 
-    - duration: 60           # Ramp down: 1 minuto
-      arrivalRate: 50        # Inicia com 50 req/s
-      rampTo: 0              # Reduz até 0 req/s gradualmente
+    - duration: 120           # Ramp down: duração de 3 minutos para desaceleração
+      arrivalRate: 150        # Inicia com 50 req/s
+      rampTo: 0               # Reduz até 0 req/s gradualmente
       name: 'ramp-down'
   plugins:
     metrics-by-endpoint:
