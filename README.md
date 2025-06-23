@@ -101,3 +101,7 @@ Os resultados são enviados para o Artillery Cloud para análise detalhada (a ch
     kubectl describe pod <nome-do-pod> -n activity-service
     ```
 
+
+
+kubectl get hpa -n activity-service -w
+kubectl get pods -n activity-service -w
