@@ -1,177 +1,103 @@
-# Activity Service - Kubernetes Setup
+# Activity Service - Kubernetes & Resilience Demo
 
-Este projeto demonstra um serviço de atividades com escalonamento horizontal automático usando Kubernetes.
+Este projeto demonstra um serviço de atividades com escalonamento horizontal automático e testes de resiliência usando Kubernetes.
 
-## 🚀 Inicialização Rápida
+## 🚀 Guia Rápido
 
-### Opção 1: Script Automatizado (Recomendado)
-```bash
-# Executar script de configuração
-./setup-k8s.sh
-```
+O projeto utiliza scripts para automatizar a maior parte do processo.
 
-### Opção 2: Configuração Manual
+1.  **Configurar o Ambiente Kubernetes (Primeira vez):**
+    ```bash
+    ./setup-k8s.sh
+    ```
 
-#### Pré-requisitos
-- Docker Desktop
-- Minikube
-- kubectl
-- Artillery (para testes de carga)
+2.  **Executar Teste de Carga e Performance:**
+    ```bash
+    ./run-load-test-with-tunnel.sh
+    ```
+    *Este script inicia o `minikube tunnel` automaticamente, que é necessário para acessar os serviços no macOS e Windows.*
 
-#### Instalação das Ferramentas (macOS)
-```bash
-# Instalar Minikube
-curl -LO https://storage.googleapis.com/minikube/releases/latest/minikube-darwin-amd64
-sudo install minikube-darwin-amd64 /usr/local/bin/minikube
+3.  **Monitorar o Ambiente em Tempo Real:**
+    *Abra um novo terminal e execute:*
+    ```bash
+    ./monitor-k8s.sh
+    ```
 
-# Instalar kubectl
-curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/darwin/amd64/kubectl"
-sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
-```
+4.  **Limpar o Ambiente:**
+    *Para o Minikube e remove todos os recursos do Kubernetes.*
+    ```bash
+    ./cleanup-k8s.sh
+    ```
 
-#### Configuração do Ambiente
-```bash
-# Iniciar Minikube
-minikube start --cpus=4 --memory=8192 --driver=docker
+---
 
-# Habilitar addons necessários
-minikube addons enable ingress
-minikube addons enable metrics-server
+## 🏗️ Arquitetura e Componentes
 
-# Configurar ambiente Docker
-eval $(minikube docker-env)
+-   **Namespace**: `activity-service` isola todos os componentes.
+-   **Deployment**: Gerencia os pods da aplicação NestJS.
+-   **Service (ClusterIP)**: Para comunicação interna entre a aplicação e o MongoDB.
+-   **Service (LoadBalancer)**: Expõe a aplicação para testes de carga via `minikube tunnel`.
+-   **HPA (Horizontal Pod Autoscaler)**: Escala os pods automaticamente com base no uso de CPU e memória.
+-   **ConfigMap**: Armazena as configurações da aplicação.
+-   **StatefulSet**: Gerencia o pod do MongoDB para garantir dados persistentes.
 
-# Build da imagem
-docker build -t activity-service:latest .
+---
 
-# Aplicar manifests
-kubectl apply -f k8s/namespace.yaml
-kubectl apply -f k8s/configmap.yaml
-kubectl apply -f k8s/mongodb.yaml
-kubectl apply -f k8s/activity-service.yaml
-kubectl apply -f k8s/ingress.yaml
-```
+## 🔧 Configurações Detalhadas
+
+### Recursos por Pod
+-   **CPU Request**: 250m
+-   **CPU Limit**: 500m
+-   **Memory Request**: 256Mi
+-   **Memory Limit**: 512Mi
+
+### Horizontal Pod Autoscaler (HPA)
+-   **Mínimo de réplicas**: 2
+-   **Máximo de réplicas**: 10
+-   **Gatilho de CPU**: 50% de utilização
+-   **Gatilho de Memória**: 50% de utilização
+
+---
 
 ## 🧪 Testes de Carga
 
-### Configurar acesso
-```bash
-# Obter IP do Minikube
-MINIKUBE_IP=$(minikube ip)
-echo "Minikube IP: $MINIKUBE_IP"
+O script `run-load-test-with-tunnel.sh` executa um teste de carga que simula diferentes fases de tráfego para avaliar a performance e o escalonamento do sistema.
 
-# Adicionar ao /etc/hosts (necessário para ingress)
-echo "$MINIKUBE_IP activity-service.local" | sudo tee -a /etc/hosts
-```
+**Fases do Teste:**
+-   **Warm-up**: Aquece o sistema com carga leve (1 a 10 req/s).
+-   **Sustain**: Mantém uma carga estável (20 req/s) para medir a performance sob estresse constante.
+-   **Spike**: Simula um pico repentino de tráfego (50 req/s).
+-   **Ramp-down**: Reduz a carga gradualmente.
 
-### Executar teste de carga
-```bash
-# Teste básico
-artillery run artillary-load-test.yml
+Os resultados são enviados para o Artillery Cloud para análise detalhada (a chave está no script).
 
-# Teste com métricas (requer conta no Artillery)
-artillery run artillary-load-test.yml --record --key YOUR_API_KEY
-```
+---
 
-## 📊 Monitoramento
+## 🛠️ Comandos Úteis para Monitoramento e Debug
 
-### Script de Monitoramento
-```bash
-# Monitorar em tempo real
-./monitor-k8s.sh
-```
+-   **Ver status dos pods:**
+    ```bash
+    kubectl get pods -n activity-service -w
+    ```
 
-### Comandos Úteis
-```bash
-# Status dos pods
-kubectl get pods -n activity-service
+-   **Ver status do HPA e escalonamento:**
+    ```bash
+    kubectl get hpa -n activity-service -w
+    ```
 
-# Status do HPA
-kubectl get hpa -n activity-service
+-   **Ver logs da aplicação em tempo real:**
+    ```bash
+    kubectl logs -f deployment/activity-service -n activity-service
+    ```
 
-# Logs da aplicação
-kubectl logs -f deployment/activity-service -n activity-service
+-   **Verificar o uso de recursos (CPU/Memória):**
+    *Requer o `metrics-server` habilitado (`minikube addons enable metrics-server`)*
+    ```bash
+    kubectl top pods -n activity-service
+    ```
 
-# Uso de recursos
-kubectl top pods -n activity-service
-
-# Status dos serviços
-kubectl get services -n activity-service
-```
-
-## 🔧 Configurações
-
-### Horizontal Pod Autoscaler (HPA)
-- **Mínimo de réplicas**: 2
-- **Máximo de réplicas**: 10
-- **Trigger de CPU**: 50% de utilização
-- **Trigger de Memória**: 50% de utilização
-
-### Recursos por Pod
-- **CPU Request**: 250m
-- **CPU Limit**: 500m
-- **Memory Request**: 256Mi
-- **Memory Limit**: 512Mi
-
-## 🏗️ Arquitetura
-
-### Componentes Kubernetes
-- **Namespace**: `activity-service`
-- **Deployment**: Aplicação NestJS com 2 réplicas iniciais
-- **Service**: ClusterIP para comunicação interna
-- **Ingress**: Nginx para acesso externo
-- **HPA**: Escalonamento automático baseado em recursos
-- **ConfigMap**: Configurações da aplicação
-- **PersistentVolume**: Dados do MongoDB
-
-### Fluxo de Tráfego
-```
-Internet → Ingress → Service → Pods (escalonáveis)
-```
-
-## 🐛 Troubleshooting
-
-### Problemas Comuns
-
-1. **Pods não iniciam**
-   ```bash
-   kubectl describe pod <pod-name> -n activity-service
-   kubectl logs <pod-name> -n activity-service
-   ```
-
-2. **Ingress não funciona**
-   ```bash
-   kubectl get ingress -n activity-service
-   minikube addons list | grep ingress
-   ```
-
-3. **HPA não escala**
-   ```bash
-   kubectl describe hpa activity-service-hpa -n activity-service
-   kubectl top pods -n activity-service
-   ```
-
-### Limpeza
-```bash
-# Parar Minikube
-minikube stop
-
-# Remover namespace
-kubectl delete namespace activity-service
-
-# Remover do /etc/hosts
-sudo sed -i '' '/activity-service.local/d' /etc/hosts
-```
-
-## 📈 Métricas de Performance
-
-O sistema está configurado para escalar automaticamente quando:
-- CPU média dos pods > 50%
-- Memória média dos pods > 50%
-
-O teste de carga simula:
-- **Warm-up**: 1-10 req/s por 1 minuto
-- **Sustain**: 20 req/s por 2 minutos  
-- **Spike**: 50 req/s por 1 minuto
-- **Ramp-down**: 50-0 req/s por 1 minuto
+-   **Descrever um pod para ver detalhes e eventos:**
+    ```bash
+    kubectl describe pod <nome-do-pod> -n activity-service
+    ```
 
