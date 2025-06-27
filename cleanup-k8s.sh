@@ -7,13 +7,16 @@ echo "=============================="
 echo "🛑 Parando Minikube..."
 minikube stop
 
+echo "🗑️ Removendo Minikube..."
+minikube delete
+
 # Remover namespace (isso remove todos os recursos)
 echo "🗑️ Removendo namespace activity-service..."
 kubectl delete namespace activity-service --ignore-not-found=true
 
 # Remover entrada do /etc/hosts
 echo "📝 Removendo entrada do /etc/hosts..."
-sudo sed -i '' '/activity-service.local/d' /etc/hosts
+# sudo sed -i '' '/activity-service.local/d' /etc/hosts
 
 echo "✅ Limpeza concluída!"
 echo ""

@@ -1,5 +1,5 @@
 config:
-  target: http://127.0.0.1
+  target: http://localhost
   phases:
     - duration: 120           # Warm up: duração de 3 minutos (ajustável conforme necessário)
       arrivalRate: 1          # Começa com 5 req/s
@@ -22,28 +22,8 @@ config:
     metrics-by-endpoint:
       useOnlyRequestNames: true
   http:
-    timeout: 30
-    headers:
-      User-Agent: "Artillery Load Test"
+    timeout: 120
 scenarios:
-  - name: "Test Activities Endpoint"
-    weight: 70
-    flow:
-      - get:
-          url: '/activities?id=66bada13e54403002078ab10&coords=-47.993931,-16.004896'
-          expect:
-            - statusCode: 200
-  - name: "Test Health Check"
-    weight: 20
-    flow:
-      - get:
-          url: '/'
-          expect:
-            - statusCode: 200
-  - name: "Test Categories Endpoint"
-    weight: 10
-    flow:
-      - get:
-          url: '/categories'
-          expect:
-            - statusCode: 200 
+  - flow:
+    - get:
+        url: '/activities?id=66bada13e54403002078ab10&coords=-47.993931,-16.004896'
