@@ -19,7 +19,7 @@ minikube stop 2>/dev/null || true
 
 # Iniciar minikube com configurações mínimas
 echo "🚀 Iniciando minikube..."
-minikube start --cpus=2 --memory=2000 --driver=docker
+minikube start --cpus=4 --memory=3919 --driver=docker
 
 # Verificar se iniciou
 if ! minikube status | grep -q "Running"; then
