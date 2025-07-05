@@ -29,7 +29,7 @@ export class Location {
 }
 
 @Schema({ collection: 'user', timestamps: { createdAt: 'registerDate' } })
-export class Users extends Document {
+export class User {
   @Prop({ required: true, index: true })
   name: string;
 
@@ -81,4 +81,5 @@ export class Users extends Document {
   biography: string;
 }
 
-export const UsersSchema = SchemaFactory.createForClass(Users);
+export const UserSchema = SchemaFactory.createForClass(User);
+export type UsersDocument = User & Document;

@@ -1,0 +1,1 @@
+{"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_"}],"uuid":"fed5399ce81a47dd995843fe82c32021","collectionName":"timelineEventTemplate","type":"collection"}
