@@ -1,22 +1,22 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { Categories } from 'src/categories/schemas/categories.schema';
-import { Users } from 'src/users/schemas/users.schema';
-import { HelpStatusEnum } from 'src/utils/enums/helpStatusEnum';
+import { User } from 'src/user/schemas/user.schema';
+import { HelpStatus } from '../enums/HelpStatus.enum';
 import { calculateDistance, getDistance } from 'src/utils/geolocation/calculateDistance';
 
 @Schema({ timestamps: { createdAt: 'creationDate' }, collection: 'userHelp' })
-export class Help extends Document {
+export class Help {
   @Prop({ required: true })
   title: string;
 
   @Prop({ required: true, maxlength: 300 })
   description: string;
 
-  @Prop({ type: String, enum: Object.values(HelpStatusEnum), default: HelpStatusEnum.WAITING })
+  @Prop({ type: String, enum: Object.values(HelpStatus), default: HelpStatus.WAITING })
   status: string;
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: Users.name }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: User.name }] })
   possibleHelpers: Types.ObjectId[];
 
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Entity' }] })
@@ -25,10 +25,10 @@ export class Help extends Document {
   @Prop({ type: [{ type: Types.ObjectId, ref: Categories.name }] })
   categoryId: Types.ObjectId[];
 
-  @Prop({ type: Types.ObjectId, ref: Users.name, required: true })
+  @Prop({ type: Types.ObjectId, ref: User.name, required: true })
   ownerId: Types.ObjectId;
 
-  @Prop({ type: Types.ObjectId, ref: Users.name })
+  @Prop({ type: Types.ObjectId, ref: User.name })
   helperId?: Types.ObjectId;
 
   @Prop({ type: Date })
@@ -47,6 +47,7 @@ export class Help extends Document {
 }
 
 export const HelpSchema = SchemaFactory.createForClass(Help);
+export type HelpDocument = Help & Document;
 
 HelpSchema.virtual('categories', {
   ref: Categories.name,
@@ -55,7 +56,7 @@ HelpSchema.virtual('categories', {
 });
 
 HelpSchema.virtual('user', {
-  ref: Users.name,
+  ref: User.name,
   localField: 'ownerId',
   foreignField: '_id',
   justOne: true,
