@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
 @Schema({ collection: 'category' })
-export class Categories {
+export class Category {
   @Prop({ required: true })
   name: string;
 
@@ -13,5 +13,5 @@ export class Categories {
   active: boolean;
 }
 
-export type CategoriesDocument = Categories & Document;
-export const CategoriesSchema = SchemaFactory.createForClass(Categories);
+export type CategoryDocument = Category & Document;
+export const CategorySchema = SchemaFactory.createForClass(Category);

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
-import { Categories } from 'src/categories/schemas/categories.schema';
+import { Category } from 'src/category/schemas/category.schema';
 import { User } from 'src/user/schemas/user.schema';
 import { HelpStatus } from '../enums/HelpStatus.enum';
 import { calculateDistance, getDistance } from 'src/utils/geolocation/calculateDistance';
@@ -22,7 +22,7 @@ export class Help {
   @Prop({ type: [{ type: Types.ObjectId, ref: 'Entity' }] })
   possibleEntities: Types.ObjectId[];
 
-  @Prop({ type: [{ type: Types.ObjectId, ref: Categories.name }] })
+  @Prop({ type: [{ type: Types.ObjectId, ref: Category.name }] })
   categoryId: Types.ObjectId[];
 
   @Prop({ type: Types.ObjectId, ref: User.name, required: true })
@@ -50,7 +50,7 @@ export const HelpSchema = SchemaFactory.createForClass(Help);
 export type HelpDocument = Help & Document;
 
 HelpSchema.virtual('categories', {
-  ref: Categories.name,
+  ref: Category.name,
   localField: 'categoryId',
   foreignField: '_id',
 });
