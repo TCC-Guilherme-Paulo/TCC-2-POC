@@ -21,11 +21,8 @@ spec:
         - containerPort: 3001
         resources:
           requests:
-            memory: "2Gi"
-            cpu: "1"
-          limits:
-            memory: "4Gi"
-            cpu: "2"
+            memory: "512Mi"
+            cpu: "500m"
         envFrom:
         - configMapRef:
             name: activity-service-config

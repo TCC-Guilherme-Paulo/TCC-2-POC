@@ -24,7 +24,7 @@
 set -euo pipefail
 
 # ---------- PARÂMETROS ----------
-BACKUP_DIR="./backup"
+BACKUP_DIR="../backup/miaAjudaDB"
 NAMESPACE="activity-service"
 POD=""
 CONTAINER=""
