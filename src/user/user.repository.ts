@@ -14,4 +14,9 @@ export class UserRepository {
   async findAll() {
     return this.model.find().exec();
   }
+
+  async findOneUserWithProjection(query: any, projection: any): Promise<User | null> {
+    const user = await this.model.findOne(query, projection).exec();
+    return user;
+  }
 }
