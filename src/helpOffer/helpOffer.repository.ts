@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types, SortOrder } from 'mongoose';
 import { HelpOffer } from './schemas/helpOffer.schema';
+import { calculateDistance, getDistance } from 'src/utils/geolocation/calculateDistance';
 
 @Injectable()
 export class HelpOfferRepository {
@@ -99,6 +100,19 @@ export class HelpOfferRepository {
         const offerLocation = this.getLocation(offer);
         const offerObj = offer.toObject();
         (offerObj as any).distances = { userCoords: offerLocation, coords };
+        
+        const userLocation = {
+          longitude: coords[0],
+          latitude: coords[1],
+        };
+        
+        const coordinates = {
+          longitude: offerLocation[0],
+          latitude: offerLocation[1],
+        };
+        
+        (offerObj as any).distanceValue = calculateDistance(coordinates, userLocation);
+        (offerObj as any).distance = getDistance(coordinates, userLocation);
         return offerObj;
       });
 
