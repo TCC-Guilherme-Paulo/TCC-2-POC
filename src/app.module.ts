@@ -7,6 +7,7 @@ import { ActivitiesModule } from './activities/activities.module';
 import { CategoryModule } from './category/category.module';
 import { HelpOfferModule } from './helpOffer/helpOffer.module';
 import { EntityModule } from './entity/entity.module';
+import { CampaignModule } from './campaign/campaign.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -19,6 +20,7 @@ import { AppController } from './app.controller';
     CategoryModule,
     HelpOfferModule,
     EntityModule,
+    CampaignModule,
   ],
   controllers: [AppController],
 })
