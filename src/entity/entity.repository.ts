@@ -15,4 +15,8 @@ export class EntityRepository {
   async findById(id: string): Promise<Entity | null> {
     return this.model.findById(id).exec();
   }
+
+  async findActiveEntities(query: any = {}): Promise<Entity[]> {
+    return this.model.find({ ...query, active: true }).exec();
+  }
 }

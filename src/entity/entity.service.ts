@@ -37,4 +37,8 @@ export class EntityService {
 
     return entity;
   }
+
+  async findActiveEntities(query: any = {}): Promise<Entity[]> {
+    return this.entityRepository.findActiveEntities(query);
+  }
 }
