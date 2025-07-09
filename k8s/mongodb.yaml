@@ -22,9 +22,6 @@ spec:
           requests:
             memory: "512Mi"
             cpu: "500m"
-          limits:
-            memory: "1Gi"
-            cpu: "1"
         env:
         - name: MONGO_INITDB_DATABASE
           value: "activityDB"
