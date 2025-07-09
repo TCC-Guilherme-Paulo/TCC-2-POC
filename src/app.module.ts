@@ -5,6 +5,8 @@ import { UserModule } from './user/user.module';
 import { HelpModule } from './help/help.module';
 import { ActivitiesModule } from './activities/activities.module';
 import { CategoryModule } from './category/category.module';
+import { HelpOfferModule } from './helpOffer/helpOffer.module';
+import { EntityModule } from './entity/entity.module';
 import { AppController } from './app.controller';
 
 @Module({
@@ -15,6 +17,8 @@ import { AppController } from './app.controller';
     HelpModule,
     ActivitiesModule,
     CategoryModule,
+    HelpOfferModule,
+    EntityModule,
   ],
   controllers: [AppController],
 })
