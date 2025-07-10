@@ -9,6 +9,7 @@ export class ActivitiesController {
   async fetchActivityList(
     @Query('id') id: string,
     @Query('isUserEntity') isUserEntity: boolean,
+    @Query('getOtherUsers') getOtherUsers: boolean | string,
     @Query('coords') coords: string,
     @Query('categoryId') categoryId?: string,
     @Query('activityId') activityId?: string,
@@ -17,11 +18,13 @@ export class ActivitiesController {
       const parsedCoords = coords ? coords.split(',').map(Number) : [];
       const categoryArray = categoryId ? categoryId.split(',') : [];
       const activitiesArray = activityId ? activityId.split(',') : ['getAll'];
+      const getOtherUsersParam = getOtherUsers === 'true'
 
       return await this.activitiesService.fetchActivityList(
         parsedCoords,
         id,
         isUserEntity,
+        getOtherUsersParam,
         categoryArray,
         activitiesArray,
       );

@@ -51,7 +51,7 @@ export class CampaignRepository {
     coords: number[],
     except: boolean,
     id: string | null,
-    categoryArray: string[] | null,
+    categoryArray: string[] | null | undefined,
   ): Promise<Campaign[]> {
     const userQuery: any = {};
     if (except && id) {
@@ -70,7 +70,7 @@ export class CampaignRepository {
 
     const populate = ['entity', 'categories'];
 
-    if (categoryArray) {
+    if (categoryArray && categoryArray.length > 0) {
       matchQuery.categoryId = {
         $in: categoryArray.map((categoryString) => new Types.ObjectId(categoryString)),
       };

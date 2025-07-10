@@ -58,7 +58,7 @@ export class HelpOfferRepository {
   async list(
     userId: string,
     isUserEntity: boolean,
-    categoryArray: string[] | null,
+    categoryArray: string[] | null | undefined,
     getOtherUsers: boolean,
     coords: number[] | null,
   ): Promise<HelpOffer[]> {
@@ -128,7 +128,7 @@ export class HelpOfferRepository {
     isUserEntity: boolean,
     active: boolean,
     getOtherUsers: boolean,
-    categoryArray: string[] | null,
+    categoryArray: string[] | null | undefined,
   ): any {
     const matchQuery: any = { active };
 
@@ -144,7 +144,7 @@ export class HelpOfferRepository {
       matchQuery.ownerId = { $eq: new Types.ObjectId(userId) };
     }
 
-    if (categoryArray) {
+    if (categoryArray && categoryArray.length > 0) {
       matchQuery.categoryId = {
         $in: categoryArray.map((category) => new Types.ObjectId(category)),
       };
