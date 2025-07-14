@@ -32,4 +32,15 @@ export class UserService {
 
     return user;
   }
+
+  async findOneUserWithProjection(userId: string, projection: any): Promise<User | null> {
+    const query = { _id: new Types.ObjectId(userId) };
+
+    const user = await this.userRepository.findOneUserWithProjection(
+      query,
+      projection,
+    );
+
+    return user;
+  }
 }

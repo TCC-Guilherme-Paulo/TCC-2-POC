@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { EntityService } from './entity.service';
+import { EntityRepository } from './entity.repository';
 import { Entity, EntitySchema } from './schemas/entity.schema';
 
 @Module({
@@ -9,7 +10,7 @@ import { Entity, EntitySchema } from './schemas/entity.schema';
       { name: Entity.name, schema: EntitySchema },
     ]),
   ],
-  providers: [EntityService],
+  providers: [EntityService, EntityRepository],
   exports: [EntityService],
 })
 export class EntityModule {} 
