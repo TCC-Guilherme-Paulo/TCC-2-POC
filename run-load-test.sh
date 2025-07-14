@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "🚀 Iniciando teste de carga com Minikube Tunnel"
+echo "🚀 Iniciando teste de carga via nginx (sem tunnel)"
 echo "================================================"
 
 # Verificar se minikube está rodando
@@ -21,40 +21,32 @@ fi
 
 echo "✅ Pods prontos!"
 
-# Iniciar minikube tunnel em background
-echo "🌐 Iniciando minikube tunnel..."
-minikube tunnel > /dev/null 2>&1 &
-TUNNEL_PID=$!
+# Obter IP do minikube
+MINIKUBE_IP=$(minikube ip)
+NODEPORT=30080
 
-# Aguardar o tunnel estar pronto
-echo "⏳ Aguardando tunnel estar pronto..."
-sleep 10
+# Atualizar nginx.conf com o IP correto (opcional, se não for fixo)
+sed "s/<MINIKUBE_IP>/$MINIKUBE_IP/g" nginx.conf > nginx-temp.conf
 
-# Verificar se o LoadBalancer está ativo
-echo "🔍 Verificando LoadBalancer..."
-for i in {1..30}; do
-    EXTERNAL_IP=$(kubectl get service activity-service-lb -n activity-service -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null)
-    if [ "$EXTERNAL_IP" = "127.0.0.1" ]; then
-        echo "✅ LoadBalancer ativo em $EXTERNAL_IP"
+# Subir nginx em docker
+echo "🌐 Subindo nginx como proxy reverso..."
+docker run --rm -d --name nginx-proxy -p 8080:8080 -v $(pwd)/nginx-temp.conf:/etc/nginx/nginx.conf:ro nginx:alpine
+# docker run --rm -d --name nginx-proxy -p 8080:8080 -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro nginx:alpine
+
+# Testar se o serviço está acessível via nginx
+echo "🧪 Testando acesso ao serviço via nginx..."
+for i in {1..10}; do
+    if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200"; then
+        echo "✅ Serviço acessível via nginx!"
         break
     fi
-    echo "⏳ Aguardando LoadBalancer... ($i/30)"
+    echo "⏳ Aguardando serviço via nginx... ($i/10)"
     sleep 2
 done
 
-if [ "$EXTERNAL_IP" != "127.0.0.1" ]; then
-    echo "❌ LoadBalancer não ficou ativo. Parando tunnel..."
-    kill $TUNNEL_PID 2>/dev/null
-    exit 1
-fi
-
-# Testar se o serviço está acessível
-echo "🧪 Testando acesso ao serviço..."
-if curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1 | grep -q "200"; then
-    echo "✅ Serviço acessível!"
-else
-    echo "❌ Serviço não está respondendo. Parando tunnel..."
-    kill $TUNNEL_PID 2>/dev/null
+if ! curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200"; then
+    echo "❌ Serviço não está respondendo via nginx. Parando nginx..."
+    docker stop nginx-proxy
     exit 1
 fi
 
@@ -65,7 +57,7 @@ echo "   ./monitor-k8s.sh"
 echo ""
 
 # Executar teste de carga
-artillery run artillery/artillary-load-test.yml --record --key a9_19g1891m75d4ongelvyli55fk3murwrr
+# artillery run artillery/artillary-load-test.yml --record --key a9_19g1891m75d4ongelvyli55fk3murwrr
 
 echo ""
 echo "✅ Teste de carga concluído!"
@@ -73,8 +65,11 @@ echo "📊 Status final:"
 kubectl get pods -n activity-service
 kubectl get hpa -n activity-service
 
-# Parar o tunnel
-echo "🛑 Parando minikube tunnel..."
-kill $TUNNEL_PID 2>/dev/null
+# Parar nginx
+echo "🛑 Parando nginx proxy..."
+docker stop nginx-proxy
 
-echo "✅ Processo concluído!" 
+# Limpar arquivo temporário
+rm -f nginx-temp.conf
+
+echo "✅ Processo concluído!"

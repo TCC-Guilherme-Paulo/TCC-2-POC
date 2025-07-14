@@ -55,7 +55,8 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 3001
-  type: LoadBalancer
+      nodePort: 30080  # Escolha uma porta entre 30000-32767
+  type: NodePort
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
