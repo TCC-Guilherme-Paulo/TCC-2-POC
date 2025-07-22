@@ -26,29 +26,13 @@ MINIKUBE_IP=$(minikube ip)
 NODEPORT=30080
 
 # Atualizar nginx.conf com o IP correto (opcional, se não for fixo)
-sed "s/<MINIKUBE_IP>/$MINIKUBE_IP/g" nginx.conf > nginx-temp.conf
+# sed "s/<MINIKUBE_IP>/$MINIKUBE_IP/g" nginx.conf > nginx-temp.conf
 
 # Subir nginx em docker
 echo "🌐 Subindo nginx como proxy reverso..."
-docker run --rm -d --name nginx-proxy -p 8080:8080 -v $(pwd)/nginx-temp.conf:/etc/nginx/nginx.conf:ro nginx:alpine
+docker run --rm -d --name nginx-proxy -p 8080:8080 -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro nginx:alpine
 # docker run --rm -d --name nginx-proxy -p 8080:8080 -v $(pwd)/nginx.conf:/etc/nginx/nginx.conf:ro nginx:alpine
 
-# Testar se o serviço está acessível via nginx
-echo "🧪 Testando acesso ao serviço via nginx..."
-for i in {1..10}; do
-    if curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200"; then
-        echo "✅ Serviço acessível via nginx!"
-        break
-    fi
-    echo "⏳ Aguardando serviço via nginx... ($i/10)"
-    sleep 2
-done
-
-if ! curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 | grep -q "200"; then
-    echo "❌ Serviço não está respondendo via nginx. Parando nginx..."
-    docker stop nginx-proxy
-    exit 1
-fi
 
 echo ""
 echo "🚀 Iniciando teste de carga..."
@@ -66,10 +50,10 @@ kubectl get pods -n activity-service
 kubectl get hpa -n activity-service
 
 # Parar nginx
-echo "🛑 Parando nginx proxy..."
-docker stop nginx-proxy
+# echo "🛑 Parando nginx proxy..."
+# docker stop nginx-proxy
 
 # Limpar arquivo temporário
-rm -f nginx-temp.conf
+# rm -f nginx-temp.conf
 
 echo "✅ Processo concluído!"

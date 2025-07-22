@@ -7,7 +7,7 @@ import { HelpStatus } from './enums/HelpStatus.enum';
 
 @Injectable()
 export class HelpRepository {
-  constructor(@InjectModel(Help.name) private readonly helpModel: Model<HelpDocument>) {}
+  constructor(@InjectModel(Help.name) private readonly helpModel: Model<HelpDocument>) { }
 
   async countByOwner(ownerId: ObjectId): Promise<number> {
     const query: FilterQuery<HelpDocument> = {
@@ -58,7 +58,7 @@ export class HelpRepository {
       '_id', 'ownerId', 'categoryId', 'possibleHelpers', 'possibleEntities',
       'description', 'helperId', 'status', 'title', 'location', 'creationDate',
     ];
-    return this.helpModel.findOne(matchQuery, helpFields.join(' '))
+    return await this.helpModel.findOne(matchQuery, helpFields.join(' '))
       .populate([
         { path: 'user', select: ['photo', 'name', 'phone', 'birthday', 'address.city', 'location.coordinates'] },
         { path: 'categories', select: ['_id', 'name'] },
@@ -142,7 +142,7 @@ export class HelpRepository {
   async getHelpInfoById(helpId: string): Promise<any> {
     const matchQuery = { _id: new Types.ObjectId(helpId) };
     const populate = { path: 'user', select: ['photo', 'birthday', 'address.city'] };
-    const projection = { description: 1, _id: 0 };
-    return this.helpModel.findOne(matchQuery, projection).populate([populate]).exec();
+    const projection = { "_id": 1, "description": 1 };
+    return await this.helpModel.findOne(matchQuery).populate([populate]).exec();
   }
 }

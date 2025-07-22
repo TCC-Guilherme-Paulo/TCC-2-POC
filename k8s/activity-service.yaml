@@ -56,7 +56,7 @@ spec:
       port: 80
       targetPort: 3001
       nodePort: 30080  # Escolha uma porta entre 30000-32767
-  type: NodePort
+  type: LoadBalancer
 ---
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
@@ -69,7 +69,7 @@ spec:
     kind: Deployment
     name: activity-service
   minReplicas: 2
-  maxReplicas: 10
+  maxReplicas: 2
   behavior:
     scaleUp:
       stabilizationWindowSeconds: 10
@@ -89,10 +89,10 @@ spec:
       name: cpu
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 90
   - type: Resource
     resource:
       name: memory
       target:
         type: Utilization
-        averageUtilization: 50
+        averageUtilization: 90
