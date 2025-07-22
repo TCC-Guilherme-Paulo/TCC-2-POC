@@ -17,6 +17,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: activity-service
+            name: activity-service-lb
             port:
               number: 80 

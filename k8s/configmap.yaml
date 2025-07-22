@@ -4,6 +4,6 @@ metadata:
   name: activity-service-config
   namespace: activity-service
 data:
-  DATABASE_URL: "mongodb://mongo-service:27017/activityDB"
+  DATABASE_URL: "mongodb://mongo-service:27017/activityDB?maxPoolSize=200"
   NODE_ENV: "production"
   PORT: "3001" 

@@ -1,5 +1,5 @@
 config:
-  target: http://192.168.49.2:30080
+  target: http://activity-service.local
   phases:
     - duration: 120           # Warm up: duração de 3 minutos (ajustável conforme necessário)
       arrivalRate: 1          # Começa com 5 req/s
