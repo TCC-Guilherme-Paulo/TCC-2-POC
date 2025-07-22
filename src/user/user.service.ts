@@ -10,7 +10,7 @@ export class UserService {
   constructor(
     private readonly userRepository: UserRepository,
     @InjectModel(User.name) private readonly userModel: Model<UsersDocument>,
-  ) {}
+  ) { }
 
   async create(data) {
     return await this.userRepository.create(data);
@@ -20,7 +20,7 @@ export class UserService {
     return await this.userRepository.findAll();
   }
 
-  async getById(id: string, projection: string | string[] = ''): Promise<UsersDocument> {
+  async getById(id: string, projection?: any): Promise<UsersDocument> {
     if (!Types.ObjectId.isValid(id)) {
       throw new NotFoundException('Usuário não encontrado');
     }

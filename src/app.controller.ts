@@ -11,6 +11,11 @@ export class AppController {
         };
     }
 
+    @Get('status')
+    status() {
+        return { status: 'ok', service: 'activity-service', 'hostname': process.env.HOSTNAME };
+    }
+
     @Get('health')
     health() {
         return { status: 'ok' };
